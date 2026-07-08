@@ -10,35 +10,35 @@
 
 - **Overall churn rate:** 26.5% across the customer base.
 
-![Churn vs Retained Customers](01-churn-distribution.png)
+![Churn vs Retained Customers](https://github.com/user-attachments/assets/143b16fe-7ff3-4ffe-948d-8ce8373f45b7)
 
 - **Highest churn segments:** customers with less than 12 months tenure (48.3%), month-to-month contracts (42.7%), fiber optic subscribers (41.9%), customers without online security or tech support (around 42%), and senior citizens (41.7%).
 
-![Churn by Segment](02-churn-by-segment.png)
+![Churn by Segment](https://github.com/user-attachments/assets/21aaaaef-e428-4556-8d8d-4a820a09cd7a)
 
 - **Revenue concentration:** churners make up 26.5% of customers but 30.5% of monthly recurring revenue, with month-to-month contracts responsible for about $121,000 of the roughly $139,000 in monthly revenue lost to churn.
 
-![Revenue at Risk](03-revenue-at-risk.png)
+![Revenue at Risk](https://github.com/user-attachments/assets/008be10f-5556-403e-989a-f6858ba64838)
 
 - **Fiber optic paradox:** fiber customers pay $91.50 a month on average versus $58.10 for DSL, yet churn more than twice as often, with nearly triple the support tickets, pointing to service experience rather than price as the driver.
 
-![Fiber Optic Paradox](05-fiber-optic-paradox.png)
+![Fiber Optic Paradox](https://github.com/user-attachments/assets/43a9e780-6ee6-4a54-a1a8-f405830164e6)
 
 - **Bundling effect:** churn drops from over 40% among customers with one or two services to under 6% among those with all seven.
 
-![Service Bundle Effect](04-service-bundle-effect.png)
+![Service Bundle Effect](https://github.com/user-attachments/assets/3fa04d07-96f6-49f8-8928-e27c16b56414)
 
 - **Support tickets as a signal:** churn jumps from roughly 20 to 40% at up to five tickets to 70 to 83% at six or more.
 
-![Support Tickets Signal](06-support-tickets-signal.png)
+![Support Tickets Signal](https://github.com/user-attachments/assets/f354c82f-18d6-47ec-9aa8-29ab5a48a29e)
 
 - **High-value churners:** within the top 20% of customers by monthly charge, 467 have already churned, about a quarter of all churners and roughly $47,000 in lost monthly revenue, and this group is overwhelmingly month-to-month, entirely fiber optic, and largely without tech support.
 
-![High-Value Churners](07-high-value-churners.png)
+![High-Value Churners](https://github.com/user-attachments/assets/50d9a8ca-ee32-48bf-8381-e477ca5e3645)
 
 - **Risk scoring:** a score built from seven churn-associated flags rises from about 1% churn at a score of zero to roughly 74% at a score of six, and applying it to still-active customers flags 423 accounts, worth about $34,000 in monthly recurring revenue, as currently high risk.
 
-![Risk Scoring](08-risk-scoring.png)
+![Risk Scoring](https://github.com/user-attachments/assets/1ff692b7-5006-4541-99eb-982aad58119b)
 
 ## 🚀 Strategies
 
