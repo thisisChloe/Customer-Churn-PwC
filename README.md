@@ -9,6 +9,8 @@
 ## 🔍 Key Findings
 
 - **Overall churn rate:** 26.5% across the customer base.
+- <img width="580" height="460" alt="01-churn-distribution" src="https://github.com/user-attachments/assets/cec97b70-7244-468e-92ca-8f9c3d51b6c9" />
+
 
 ![Churn vs Retained Customers](https://github.com/user-attachments/assets/143b16fe-7ff3-4ffe-948d-8ce8373f45b7)
 
