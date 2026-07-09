@@ -1,6 +1,6 @@
 # 📡 Telecom Customer Churn Analysis: A PwC Case Study
 
-**Canva Link:**https://canva.link/6g5h3j4m87on5vt
+**Canva Link:** https://canva.link/6g5h3j4m87on5vt
 
 ## 🎯 Project Overview
 
