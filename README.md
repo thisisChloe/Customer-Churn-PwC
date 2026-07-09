@@ -1,5 +1,7 @@
 # 📡 Telecom Customer Churn Analysis: A PwC Case Study
 
+**Canva Link:**https://canva.link/6g5h3j4m87on5vt
+
 ## 🎯 Project Overview
 
 - **Objective:** Investigate why customers leave the telecom provider and where the business stands to lose the most revenue, moving beyond a single churn rate to pinpoint which segments, contracts, and service experiences drive attrition.
