@@ -1,50 +1,300 @@
 # 📡 Telecom Customer Churn Analysis: A PwC Case Study
 
-**Canva Link:** https://canva.link/6g5h3j4m87on5vt
+> Completed as part of the PwC Switzerland **Power BI / Data Analytics virtual experience
+> programme** (Forage). Self-directed case study on a provided dataset — not client work, and the
+> figures below describe the sample file only, not any real telecom operator.
+
+**Report deck:** https://canva.link/6g5h3j4m87on5vt
+
+**Analysis:** [`churn_eda_v2.ipynb`](churn_eda_v2.ipynb)
+
+---
 
 ## 🎯 Project Overview
 
-- **Objective:** Investigate why customers leave the telecom provider and where the business stands to lose the most revenue, moving beyond a single churn rate to pinpoint which segments, contracts, and service experiences drive attrition.
-- **Dataset:** A customer-level file (02 Churn-Dataset.xlsx) covering 7,043 customers and 23 attributes, spanning demographics, account details, subscribed services, support activity, and the churn outcome.
-- **Methodology:** Data cleaning and encoding in churn_eda_v2.ipynb, followed by churn distribution analysis across categorical and numerical features, correlation checks, revenue impact quantification, service and support pattern analysis, high-value churner profiling, and a final additive risk score built from seven churn-associated flags.
+**Audience.** Written for the retention lead in a consumer telecom division, with the CFO as
+secondary reader — the first needs a list of accounts to act on, the second needs the revenue at
+stake sized before funding retention offers.
+
+**Objective.** Move past a single headline churn rate to identify which segments, contracts and
+service experiences carry attrition, how much recurring revenue sits behind them, and whether any
+observable behaviour flags a customer early enough to intervene.
+
+**In scope.** Descriptive analysis of one customer-level snapshot: segment churn rates, recurring
+revenue attached to churners, service and support patterns, high-value churner profiling, and a
+transparent additive risk score that runs without a modelling pipeline.
+
+**Out of scope.** Causal attribution, predictive modelling with holdout validation, customer
+lifetime value or margin analysis, offer design and pricing, competitor context, and any cohort or
+time-series view — the file has no dates.
+
+**Methodology.** Cleaning and encoding, then churn distribution across categorical and numerical
+features, correlation checks, revenue quantification, service-bundle and support-ticket analysis,
+high-value churner profiling, and a six-flag additive risk score validated against actual churn.
+Fourteen numbered sections in `churn_eda_v2.ipynb`.
+
+---
+
+## 📂 Data
+
+**File:** `02 Churn-Dataset.xlsx` — 7,043 rows × 23 columns, one row per customer, no duplicate
+`customerID`, no rows dropped during cleaning.
+
+**Data source.** Columns 1–21 plus `Churn` are the **IBM Telco Customer Churn** sample dataset,
+originally published by IBM as accelerator sample data:
+
+- IBM Community (original publication): https://community.ibm.com/community/user/blogs/steven-macko/2019/07/11/telco-customer-churn-1113
+- Kaggle (the commonly used mirror): https://www.kaggle.com/datasets/blastchar/telco-customer-churn
+
+The two support-activity columns, `numAdminTickets` and `numTechTickets`, are **not** present in
+either source — they were added by the programme for this case study, and no data dictionary was
+supplied for them. See *Limitations*.
+
+**Snapshot semantics.** A single point-in-time extract with no date column and no customer history,
+so `Churn` is a state at snapshot time, not an event with a timestamp. Every "churn rate" below is a
+cross-sectional share, not a hazard rate over a defined window.
+
+**Assumptions carried through the analysis.**
+
+1. `Churn = Yes` is a completed departure, and the recorded attributes describe the customer
+   *before* leaving. Nothing in the file proves this ordering.
+2. Ticket counts cover a recent window rather than the full customer lifetime — undocumented, see
+   Limitations.
+3. `MonthlyCharges` is a stable proxy for recurring revenue, so summing it across a segment gives
+   that segment's MRR. Ignores expiring discounts, downgrades and one-off charges.
+
+Terms of use: [Licence & Attribution](#-licence--attribution) at the end of this README.
+
+### Data dictionary
+
+| Column | Type | Values / range | Notes |
+|---|---|---|---|
+| `customerID` | id | 7,043 unique | no duplicates |
+| `gender` | cat | Female, Male | |
+| `SeniorCitizen` | bin | 0, 1 | 1 = 65+; only age signal in the file |
+| `Partner` | cat | Yes, No | |
+| `Dependents` | cat | Yes, No | |
+| `tenure` | int | 0–72 months | 11 customers at 0 = signed up in the current cycle |
+| `PhoneService` | cat | Yes, No | |
+| `MultipleLines` | cat | Yes, No, No phone service | third level is a structural "not applicable" |
+| `InternetService` | cat | DSL (2,421), Fiber optic (3,096), No (1,526) | |
+| `OnlineSecurity` | cat | Yes, No, No internet service | third level = not applicable |
+| `OnlineBackup` | cat | Yes, No, No internet service | as above |
+| `DeviceProtection` | cat | Yes, No, No internet service | as above |
+| `TechSupport` | cat | Yes, No, No internet service | as above |
+| `StreamingTV` | cat | Yes, No, No internet service | as above |
+| `StreamingMovies` | cat | Yes, No, No internet service | as above |
+| `Contract` | cat | Month-to-month, One year, Two year | |
+| `PaperlessBilling` | cat | Yes, No | |
+| `PaymentMethod` | cat | Electronic check, Mailed check, Bank transfer (automatic), Credit card (automatic) | |
+| `MonthlyCharges` | float | 18.25–118.75 | current recurring charge |
+| `TotalCharges` | float | 0–8,684.80 | stored as text in the source; 11 blanks, all `tenure == 0` |
+| `numAdminTickets` | int | 0–5 (5,842 zeros) | **undocumented window**; counts for 1–5 are near-uniform (223 / 243 / 262 / 228 / 245), consistent with synthetic generation |
+| `numTechTickets` | int | 0–9 (6,073 zeros) | **undocumented window**; decays smoothly, behaves like real ticket data |
+| `Churn` | target | Yes (1,869), No (5,174) | 26.5% churn |
+
+### Cleaning decisions
+
+| Step | Rows before → after | Decision and reason |
+|---|---|---|
+| Load | — → 7,043 | 23 columns, `customerID` unique, no duplicate rows |
+| `TotalCharges` type | 7,043 → 7,043 | stored as text with blanks; coerced to numeric, producing 11 NaN |
+| `TotalCharges` blanks | 7,043 → 7,043 | all 11 are `tenure == 0`, i.e. billed nothing yet. Filled with 0 rather than dropped — these are genuine new customers, and dropping them would bias the shortest-tenure bucket, which has the highest churn |
+| Target encoding | 7,043 → 7,043 | `Churned = (Churn == 'Yes')` |
+| Outliers | 7,043 → 7,043 | none removed; `tenure` 0–72, `MonthlyCharges` 18.25–118.75, `TotalCharges` 0–8,684.80 all sit within plausible product ranges |
+| Structural nulls | — | "No internet service" / "No phone service" kept as their own level rather than recoded to "No" — they mark non-applicability, not a customer choice (see the bundling finding) |
+
+**No rows were dropped at any stage: 7,043 in, 7,043 out.**
+
+---
+
+## ▶️ How to run
+
+```bash
+git clone https://github.com/thisisChloe/Customer-Churn-PwC.git
+cd Customer-Churn-PwC
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+jupyter lab churn_eda_v2.ipynb
+```
+
+Then **Kernel → Restart Kernel and Run All Cells**.
+
+The notebook is **strictly sequential**: `df` is enriched in place as it goes (`AddonCount` in section 10,
+tech-ticket bands in section 12, `HistoricalRevenue` in section 13, `risk_*` and `RiskScore` in
+section 14), so running cells out
+of order will raise `KeyError` or silently reuse stale columns. There is no randomness, so a full
+run reproduces every figure in this README exactly.
+
+Paths are relative to the repository root; the Excel file must stay next to the notebook.
+
+---
 
 ## 🔍 Key Findings
 
-- **Overall churn rate:** 26.5% across the customer base.
-- <img width="580" height="460" alt="01-churn-distribution" src="https://github.com/user-attachments/assets/cec97b70-7244-468e-92ca-8f9c3d51b6c9" />
+**Overall churn rate: 26.5%** — 1,869 of 7,043 customers. This is the baseline every figure below
+should be read against.
 
-- **Highest churn segments:** customers with less than 12 months tenure (48.3%), month-to-month contracts (42.7%), fiber optic subscribers (41.9%), customers without online security or tech support (around 42%), and senior citizens (41.7%).
+<img width="580" height="460" alt="01-churn-distribution" src="https://github.com/user-attachments/assets/cec97b70-7244-468e-92ca-8f9c3d51b6c9" />
+
+**Highest churn segments.** Tenure under 12 months 48.3%, month-to-month contracts 42.7%, fiber
+optic 41.9%, no online security 41.8%, senior citizens 41.7%, no tech support 41.6%, paperless
+billing 33.6%. These populations overlap heavily, so the rates are marginal, not independent effects.
 
 <img width="2375" height="1941" alt="02-churn-by-segment" src="https://github.com/user-attachments/assets/16107693-17e5-4c7a-be17-40b3cf5f8f19" />
 
-- **Revenue concentration:** churners make up 26.5% of customers but 30.5% of monthly recurring revenue, with month-to-month contracts responsible for about $121,000 of the roughly $139,000 in monthly revenue lost to churn.
+**Revenue concentration.** Churners are 26.5% of customers but 30.5% of monthly recurring revenue —
+$139,131 of $456,117. Month-to-month contracts account for $120,847 of that, 87% of the revenue
+lost to churn.
 
 <img width="1363" height="460" alt="03-revenue-at-risk" src="https://github.com/user-attachments/assets/f7419775-460c-4234-9797-591c29f3042c" />
 
-- **Fiber optic paradox:** fiber customers pay $91.50 a month on average versus $58.10 for DSL, yet churn more than twice as often, with nearly triple the support tickets, pointing to service experience rather than price as the driver.
+**The fiber optic paradox.** Fiber customers pay $91.50 a month on average against $58.10 for DSL, yet
+churn 41.9% against 19.0%. They also raise 2.8 times as many technical support tickets (0.70 vs 0.25
+per customer). The pattern points at service experience rather than price sensitivity.
 
 <img width="1540" height="460" alt="05-fiber-optic-paradox" src="https://github.com/user-attachments/assets/071e68aa-ff09-481a-9db8-ddd95ecd53df" />
 
-- **Bundling effect:** churn drops from over 40% among customers with one or two services to under 6% among those with all seven.
+**Bundling effect.** Among customers who buy internet, churn falls monotonically with add-on count:
+52.2% with none (n=693), 45.8% with one, 35.8% with two, 27.4% with three, 22.3% with four, 12.4%
+with five, 5.3% with all six (n=284). Separately, the 1,526 customers with no internet at all churn
+at just 7.4% — the stickiest group in the base, but that reflects a minimal phone-only relationship,
+not bundling.
 
-<img width="1060" height="460" alt="04-service-bundle-effect" src="https://github.com/user-attachments/assets/f0ace5b1-0881-42d5-aec1-f37ac76a8832" />
+<!-- Chart pending regeneration after the section 10 rewrite (add-on count on internet customers,
+     phone-only reported separately). Superseded image, do not re-embed as-is:
+     https://github.com/user-attachments/assets/f0ace5b1-0881-42d5-aec1-f37ac76a8832 -->
 
-- **Support tickets as a signal:** churn jumps from roughly 20 to 40% at up to five tickets to 70 to 83% at six or more.
+**Support tickets — technical only.** Administrative tickets carry no churn signal: 27.1% at zero
+tickets and 20.6–26.5% across every volume from one to five, with customers raising at least one
+admin ticket churning at 24.0%, *below* the 26.5% baseline. Technical tickets are the opposite. Churn
+runs 19.7% at zero, jumps to 65.6% at the **first** ticket, and reaches 87.6% at six or more (n=113).
+The break is the first tech ticket, and it survives controlling for tenure: among customers at 25–48
+months, 7.2% churn with no tech ticket against 45.7% with any; at 49–72 months, 1.1% against 16.2%.
 
-<img width="1540" height="460" alt="06-support-tickets-signal" src="https://github.com/user-attachments/assets/5fe8ee1b-de05-4389-a47f-00aa9e958a80" />
+<!-- Chart pending regeneration after the section 12 rewrite (admin vs tech tickets side by side,
+     shared y-axis). Superseded image, do not re-embed as-is:
+     https://github.com/user-attachments/assets/5fe8ee1b-de05-4389-a47f-00aa9e958a80 -->
 
-- **High-value churners:** within the top 20% of customers by monthly charge, 467 have already churned, about a quarter of all churners and roughly $47,000 in lost monthly revenue, and this group is overwhelmingly month-to-month, entirely fiber optic, and largely without tech support.
+**High-value churners.** Within the top quintile of monthly charges (threshold $94.25), 467 customers
+have already churned — 25.0% of all churners and $47,301 in lost monthly revenue. The group is
+75.4% month-to-month, 70.9% without tech support, and 100% fiber. The fiber share is mechanical
+rather than behavioural: a $94.25 monthly charge is only reachable on a fiber plan.
 
 <img width="1540" height="460" alt="07-high-value-churners" src="https://github.com/user-attachments/assets/7e84a655-7500-407f-87b9-7a32f2006b66" />
 
-- **Risk scoring:** a score built from seven churn-associated flags rises from about 1% churn at a score of zero to roughly 74% at a score of six, and applying it to still-active customers flags 423 accounts, worth about $34,000 in monthly recurring revenue, as currently high risk.
+**Risk scoring.** Six equally weighted flags — month-to-month, fiber, no online security, no tech
+support, tenure under 12 months, any technical ticket — track actual churn closely: 0.9% at a score
+of zero, 22.9% at three, 46.5% at four, 77.0% at five, 100% at six (n=47). At a threshold of four the
+score flags 32% of the base, of whom 60.7% churned, capturing 74.2% of all churners. Applied to
+still-active customers it surfaces **898 accounts worth $68,373 in monthly recurring revenue**
+at score 4+, or a tighter **226 accounts / $18,084** at score 5+. The score is fitted in-sample; see
+Limitations.
 
-<img width="1540" height="460" alt="08-risk-scoring" src="https://github.com/user-attachments/assets/d37cd287-29a9-4b31-ac7c-cdbb648e1035" />
+<!-- Chart pending regeneration after the section 14 rewrite (six flags, SeniorCitizen removed,
+     tech-ticket flag at >= 1). Superseded image, do not re-embed as-is:
+     https://github.com/user-attachments/assets/d37cd287-29a9-4b31-ac7c-cdbb648e1035 -->
+
+---
 
 ## 🚀 Strategies
 
-- **Prioritize contract conversion:** move month-to-month customers onto longer-term contracts through modest discounts or added services in exchange for a one or two year commitment, since contract length is the single largest driver of both churn probability and revenue at risk.
-- **Audit fiber optic service quality:** the elevated churn among fiber customers appears tied to support burden rather than price sensitivity, so this deserves a direct look.
-- **Treat support tickets as an early warning sign:** intervene proactively once a customer reaches their third ticket, rather than waiting for escalation.
-- **Encourage service bundling:** adoption of security, support, and streaming add-ons is a strong retention lever, since more heavily bundled customers churn far less regardless of other factors.
-- **Act on the risk list now:** the 423 active customers currently flagged with a risk score of five or higher, representing roughly $34,000 in monthly recurring revenue, should be treated as an immediate, targeted outreach list.
+**Convert month-to-month contracts first.** Contract length carries both the largest churn gap and
+almost all the revenue at risk — $120,847 of the $139,131 lost monthly. A modest discount or an added
+service in exchange for a one- or two-year commitment is the highest-leverage single move available.
+
+**Trigger retention on the first technical ticket.** Churn triples between zero and one tech ticket,
+and the rate is then flat through five, so there is no reason to wait for escalation — watching for a
+third or later ticket adds no information. Administrative tickets should be excluded from any
+trigger; they do not predict churn.
+
+**Give new customers an onboarding play, not a ticket trigger.** For customers under 12 months the
+ticket signal barely separates (47.2% churn with no tech ticket vs 52.4% with any), so the segment
+with the highest churn of all needs proactive early-tenure contact rather than reactive alerting.
+
+**Audit fiber service quality.** Fiber churn travels with a 2.8 times technical ticket rate rather
+than with price, which makes network and installation quality the hypothesis worth testing — ticket
+volume is a symptom, and this analysis cannot name the cause.
+
+**Push internet add-on adoption.** Add-on count is the cleanest monotonic retention lever in the
+data, from 52.2% churn at zero add-ons to 5.3% at six. Security and support attach rates are the
+place to start, since both also appear independently among the high churn segments.
+
+**Work the flagged list.** Start with the 226 active customers at score 5+ ($18,084 MRR) as a
+measurable pilot, then extend to the 898 at score 4+ ($68,373 MRR) if the intervention pays back.
+Price the play before scaling: flagged MRR × retention uplift × accept rate, minus offer cost.
+
+---
+
+## ⚠️ Limitations
+
+**Undocumented ticket definitions.** `numAdminTickets` and `numTechTickets` arrive with no
+observation window. If they are lifetime counts, they are confounded with tenure and the ticket
+thresholds are biased toward long-tenured customers; if they are recent-window counts, the thresholds
+hold as stated. Mean tickets rise only mildly with tenure (0.56 at 0–6 months vs 1.26 at 49–72
+months, r = 0.15), which rules out pure lifetime accumulation but does not identify the window. The
+support findings should be read as conditional on assumption 3 above. `numAdminTickets` is treated as
+non-informative rather than a weak signal, on the evidence that it is flat against churn and
+near-uniformly distributed over 1–5.
+
+**Cross-sectional snapshot, no time dimension.** Without event dates there is no way to confirm that
+a flagged behaviour preceded the churn decision, so "early warning" is an inference from ordering,
+not a demonstrated lead time. Nothing here supports a claim about when to intervene in calendar terms.
+
+**Correlation, not causation.** Fiber, month-to-month and short tenure are heavily overlapping
+populations that this analysis does not separate. A logistic regression or stratified crosstab is
+required before attributing churn to any single attribute.
+
+**In-sample risk score.** The flags were chosen by inspecting churn in this dataset and validated on
+the same dataset, so the 0.9% to 77% gradient is fitted, not predictive performance. There is no
+train/test split and no baseline model for comparison. Expect meaningful degradation out of sample.
+
+**"Revenue at risk" is MRR, not loss.** The $139,131 figure is the recurring revenue attached to
+customers already recorded as churned. It assumes no reactivation, no downgrade path and no cost to
+serve. It is a sizing device, not a P&L number, and should not be annualised.
+
+**Structural nulls encoded as levels.** "No internet service" and "No phone service" are
+not-applicable markers, not "No" answers. Add-on counts therefore exclude the 1,526 phone-only
+customers rather than scoring them as zero; treating them as zero produces a non-monotonic bundling
+curve that mixes phone-only customers (7.4% churn) with internet customers who hold no add-ons
+(51.6% churn).
+
+**Age excluded from targeting.** `SeniorCitizen` correlates with churn (41.7%) but was dropped from
+the risk score: age is a protected characteristic in most markets, so using it to select customers
+for offers carries discrimination risk. Removing it also improved the score's separation, so nothing
+analytical was sacrificed.
+
+**Not modelled.** No outlier treatment, no interaction terms, no cost-to-serve or margin data, no
+geography, no competitor or pricing context, and no churn-reason field.
+
+---
+
+## ➡️ Next Steps
+
+1. **Get the ticket definitions.** One question to the data owner — what window, what counts as a
+   ticket — either confirms the support findings or invalidates their thresholds. Highest-value
+   unknown in the project.
+2. **Disentangle the overlapping drivers** with a logistic regression on contract, internet type,
+   tenure, add-ons and tech tickets, reporting coefficients rather than marginal rates.
+3. **Validate the risk score out of sample** with a holdout, and benchmark it against a
+   month-to-month-only rule to prove the extra flags earn their complexity.
+4. **Price the intervention** so the flagged list carries a business case rather than a headcount.
+5. **Instrument the fiber quality hypothesis** with network and installation data.
+
+---
+
+## 📄 Licence & Attribution
+
+**Code.** The analysis in `churn_eda_v2.ipynb` is released under the MIT Licence — see `LICENSE`.
+
+**Data.** `02 Churn-Dataset.xlsx` is not covered by that licence. The underlying IBM Telco Customer
+Churn dataset is distributed by IBM as sample data for learning and demonstration purposes; the
+Kaggle mirror lists its terms as "Data files © Original Authors". The copy in this repository was
+provided to programme participants for the exercise and is included only so the notebook reproduces.
+If you intend to reuse the data, take it from one of the sources linked above, under their terms.
+
+**Trademarks.** PwC and the PwC logo are trademarks of PricewaterhouseCoopers. They appear here
+because the case study was produced within PwC's virtual experience programme; this repository is
+not affiliated with, endorsed by, or reviewed by PwC.
+
+**Attribution.** Analysis and write-up by Chloe Truong.
