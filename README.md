@@ -98,8 +98,9 @@ not bundling.
 tickets and 20.6–26.5% across every volume from one to five, with customers raising at least one
 admin ticket churning at 24.0%, *below* the 26.5% baseline. Technical tickets are the opposite. Churn
 runs 19.7% at zero, jumps to 65.6% at the **first** ticket, and reaches 87.6% at six or more (n=113).
-The break is the first tech ticket, and it survives controlling for tenure: among customers at 25–48
-months, 7.2% churn with no tech ticket against 45.7% with any; at 49–72 months, 1.1% against 16.2%.
+The break is the first tech ticket, and it survives controlling for tenure. Among customers at 25–48 months, 7.1% churn with no tech
+ticket against 74.8% with at least one; at 49–72 months, 1.0% against 52.2%. The gap is present in
+every tenure band.
 
 <!-- Chart pending regeneration after the section 12 rewrite (admin vs tech tickets side by side,
      shared y-axis). Superseded image, do not re-embed as-is:
@@ -108,7 +109,8 @@ months, 7.2% churn with no tech ticket against 45.7% with any; at 49–72 months
 **High-value churners.** Within the top quintile of monthly charges (threshold $94.25), 467 customers
 have already churned — 25.0% of all churners and $47,301 in lost monthly revenue. The group is
 75.4% month-to-month, 70.9% without tech support, and 100% fiber. The fiber share is mechanical
-rather than behavioural: a $94.25 monthly charge is only reachable on a fiber plan.
+rather than behavioural: a $94.25 monthly charge is effectively only reachable on a fiber plan — 1,414 of the 1,415
+customers above the threshold are on fiber, and the single exception is a DSL customer at $94.80.
 
 <img width="1540" height="460" alt="07-high-value-churners" src="https://github.com/user-attachments/assets/7e84a655-7500-407f-87b9-7a32f2006b66" />
 
@@ -137,9 +139,11 @@ and the rate is then flat through five, so there is no reason to wait for escala
 third or later ticket adds no information. Administrative tickets should be excluded from any
 trigger; they do not predict churn.
 
-**Give new customers an onboarding play, not a ticket trigger.** For customers under 12 months the
-ticket signal barely separates (47.2% churn with no tech ticket vs 52.4% with any), so the segment
-with the highest churn of all needs proactive early-tenure contact rather than reactive alerting.
+**Escalate hardest on new customers with a tech ticket.** The ticket signal is sharpest in the
+newest cohort, not weakest: under 12 months, churn runs 46.3% with no tech ticket and 98.7% with at
+least one (n=79). The group is small, so it will not move the aggregate on its own, but it is the
+highest-conviction list in the base. Everyone else under 12 months still needs a proactive onboarding
+play, since 46.3% churn without ever raising a ticket.
 
 **Audit fiber service quality.** Fiber churn travels with a 2.8 times technical ticket rate rather
 than with price, which makes network and installation quality the hypothesis worth testing — ticket
