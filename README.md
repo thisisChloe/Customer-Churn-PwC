@@ -8,7 +8,7 @@
 
 **Analysis:** [`churn_eda_v2.ipynb`](churn_eda_v2.ipynb)
 
-**Data:** [`Data/`](Data)
+**Data:** [`Data`](Data)
 
 ---
 
