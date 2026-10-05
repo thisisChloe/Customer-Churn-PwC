@@ -79,8 +79,6 @@ Limitations.
      tech-ticket flag at >= 1). Superseded image, do not re-embed as-is:
      https://github.com/user-attachments/assets/d37cd287-29a9-4b31-ac7c-cdbb648e1035 -->
 
----
-
 ## 🚀 Strategies
 
 **Convert month-to-month contracts first.** Contract length carries both the largest churn gap and
@@ -109,62 +107,6 @@ place to start, since both also appear independently among the high churn segmen
 **Work the flagged list.** Start with the 226 active customers at score 5+ ($18,084 MRR) as a
 measurable pilot, then extend to the 898 at score 4+ ($68,373 MRR) if the intervention pays back.
 Price the play before scaling: flagged MRR × retention uplift × accept rate, minus offer cost.
-
----
-
-## ⚠️ Limitations
-
-**Undocumented ticket definitions.** `numAdminTickets` and `numTechTickets` arrive with no
-observation window. If they are lifetime counts, they are confounded with tenure and the ticket
-thresholds are biased toward long-tenured customers; if they are recent-window counts, the thresholds
-hold as stated. Mean tickets rise only mildly with tenure (0.56 at 0–6 months vs 1.26 at 49–72
-months, r = 0.15), which rules out pure lifetime accumulation but does not identify the window. The
-support findings should be read as conditional on assumption 3 above. `numAdminTickets` is treated as
-non-informative rather than a weak signal, on the evidence that it is flat against churn and
-near-uniformly distributed over 1–5.
-
-**Cross-sectional snapshot, no time dimension.** Without event dates there is no way to confirm that
-a flagged behaviour preceded the churn decision, so "early warning" is an inference from ordering,
-not a demonstrated lead time. Nothing here supports a claim about when to intervene in calendar terms.
-
-**Correlation, not causation.** Fiber, month-to-month and short tenure are heavily overlapping
-populations that this analysis does not separate. A logistic regression or stratified crosstab is
-required before attributing churn to any single attribute.
-
-**In-sample risk score.** The flags were chosen by inspecting churn in this dataset and validated on
-the same dataset, so the 0.9% to 77% gradient is fitted, not predictive performance. There is no
-train/test split and no baseline model for comparison. Expect meaningful degradation out of sample.
-
-**"Revenue at risk" is MRR, not loss.** The $139,131 figure is the recurring revenue attached to
-customers already recorded as churned. It assumes no reactivation, no downgrade path and no cost to
-serve. It is a sizing device, not a P&L number, and should not be annualised.
-
-**Structural nulls encoded as levels.** "No internet service" and "No phone service" are
-not-applicable markers, not "No" answers. Add-on counts therefore exclude the 1,526 phone-only
-customers rather than scoring them as zero; treating them as zero produces a non-monotonic bundling
-curve that mixes phone-only customers (7.4% churn) with internet customers who hold no add-ons
-(51.6% churn).
-
-**Age excluded from targeting.** `SeniorCitizen` correlates with churn (41.7%) but was dropped from
-the risk score: age is a protected characteristic in most markets, so using it to select customers
-for offers carries discrimination risk. Removing it also improved the score's separation, so nothing
-analytical was sacrificed.
-
-**Not modelled.** No outlier treatment, no interaction terms, no cost-to-serve or margin data, no
-geography, no competitor or pricing context, and no churn-reason field.
-
-
-## ➡️ Next Steps
-
-1. **Get the ticket definitions.** One question to the data owner — what window, what counts as a
-   ticket — either confirms the support findings or invalidates their thresholds. Highest-value
-   unknown in the project.
-2. **Disentangle the overlapping drivers** with a logistic regression on contract, internet type,
-   tenure, add-ons and tech tickets, reporting coefficients rather than marginal rates.
-3. **Validate the risk score out of sample** with a holdout, and benchmark it against a
-   month-to-month-only rule to prove the extra flags earn their complexity.
-4. **Price the intervention** so the flagged list carries a business case rather than a headcount.
-5. **Instrument the fiber quality hypothesis** with network and installation data.
 
 ## 📄 Licence & Attribution
 
