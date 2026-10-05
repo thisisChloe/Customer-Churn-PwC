@@ -4,7 +4,7 @@
 
 **Analysis:** [`churn_eda_v2.ipynb`](churn_eda_v2.ipynb)
 
-**Data:** [`Data`](Data)
+**Data:** [`02 Churn-Dataset.xlsx`](02%20Churn-Dataset.xlsx)
 
 ## 🎯 Project Overview
 
