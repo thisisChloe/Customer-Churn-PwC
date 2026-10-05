@@ -6,54 +6,11 @@
 
 **Data:** [`Data`](Data)
 
----
-
 ## 🎯 Project Overview
 
-**Audience.** Written for the retention lead in a consumer telecom division, with the CFO as
-secondary reader — the first needs a list of accounts to act on, the second needs the revenue at
-stake sized before funding retention offers.
-
-**Objective.** Move past a single headline churn rate to identify which segments, contracts and
-service experiences carry attrition, how much recurring revenue sits behind them, and whether any
-observable behaviour flags a customer early enough to intervene.
-
-**In scope.** Descriptive analysis of one customer-level snapshot: segment churn rates, recurring
-revenue attached to churners, service and support patterns, high-value churner profiling, and a
-transparent additive risk score that runs without a modelling pipeline.
-
-**Out of scope.** Causal attribution, predictive modelling with holdout validation, customer
-lifetime value or margin analysis, offer design and pricing, competitor context, and any cohort or
-time-series view — the file has no dates.
-
-**Methodology.** Cleaning and encoding, then churn distribution across categorical and numerical
-features, correlation checks, revenue quantification, service-bundle and support-ticket analysis,
-high-value churner profiling, and a six-flag additive risk score validated against actual churn.
-Fourteen numbered sections in `churn_eda_v2.ipynb`.
-
----
-
-## ▶️ How to run
-
-```bash
-git clone https://github.com/thisisChloe/Customer-Churn-PwC.git
-cd Customer-Churn-PwC
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-jupyter lab churn_eda_v2.ipynb
-```
-
-Then **Kernel → Restart Kernel and Run All Cells**.
-
-The notebook is **strictly sequential**: `df` is enriched in place as it goes (`AddonCount` in section 10,
-tech-ticket bands in section 12, `HistoricalRevenue` in section 13, `risk_*` and `RiskScore` in
-section 14), so running cells out
-of order will raise `KeyError` or silently reuse stale columns. There is no randomness, so a full
-run reproduces every figure in this README exactly.
-
-Paths are relative to the repository root; the Excel file must stay in `Data/`.
-
----
+- **Objective:** Analyse customer behaviour, identify key churn drivers, and develop strategies to improve retention.
+- **Dataset:** Telecom customer data including demographics, services, billing, and support history.
+- **Methodology:** EDA, feature engineering, machine learning model training and evaluation, and strategic recommendations.
 
 ## 🔍 Key Findings
 
@@ -196,7 +153,6 @@ analytical was sacrificed.
 **Not modelled.** No outlier treatment, no interaction terms, no cost-to-serve or margin data, no
 geography, no competitor or pricing context, and no churn-reason field.
 
----
 
 ## ➡️ Next Steps
 
@@ -210,19 +166,10 @@ geography, no competitor or pricing context, and no churn-reason field.
 4. **Price the intervention** so the flagged list carries a business case rather than a headcount.
 5. **Instrument the fiber quality hypothesis** with network and installation data.
 
----
-
 ## 📄 Licence & Attribution
 
-**Code.** The analysis in `churn_eda_v2.ipynb` is released under the MIT Licence — see `LICENSE`.
+**Code** The analysis in `churn_eda_v2.ipynb` is released under the MIT Licence.
 
-**Data.** `Data/02 Churn-Dataset.xlsx` is not covered by that licence. The underlying IBM Telco Customer
-Churn dataset is distributed by IBM as sample data for learning and demonstration purposes; the
-Kaggle mirror lists its terms as "Data files © Original Authors". The copy in this repository was
-provided to programme participants for the exercise and is included only so the notebook reproduces.
-If you intend to reuse the data, take it from one of the sources linked in [`Data/README.md`](Data/README.md), under their terms.
-
-**Trademarks.** PwC and the PwC logo are trademarks of PricewaterhouseCoopers. They appear here
-because the case study was produced within PwC's virtual experience programme; this repository is
-not affiliated with, endorsed by, or reviewed by PwC.
+**Trademarks** PwC and the PwC logo are trademarks of PricewaterhouseCoopers. They appear here
+because the case study was produced within PwC's virtual experience programme; this repository is not affiliated with, endorsed by, or reviewed by PwC.
 
