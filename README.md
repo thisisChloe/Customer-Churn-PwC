@@ -108,7 +108,7 @@ place to start, since both also appear independently among the high churn segmen
 measurable pilot, then extend to the 898 at score 4+ ($68,373 MRR) if the intervention pays back.
 Price the play before scaling: flagged MRR × retention uplift × accept rate, minus offer cost.
 
-## 📄 Licence & Attribution
+## 📄 Licence
 
 **Code** The analysis in `churn_eda_v2.ipynb` is released under the MIT Licence.
 
