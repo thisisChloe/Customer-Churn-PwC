@@ -1,9 +1,5 @@
 # 📡 Telecom Customer Churn Analysis: A PwC Case Study
 
-> Completed as part of the PwC Switzerland **Power BI / Data Analytics virtual experience
-> programme** (Forage). Self-directed case study on a provided dataset — not client work, and the
-> figures below describe the sample file only, not any real telecom operator.
-
 **Report deck:** https://canva.link/6g5h3j4m87on5vt
 
 **Analysis:** [`churn_eda_v2.ipynb`](churn_eda_v2.ipynb)
@@ -230,4 +226,3 @@ If you intend to reuse the data, take it from one of the sources linked in [`Dat
 because the case study was produced within PwC's virtual experience programme; this repository is
 not affiliated with, endorsed by, or reviewed by PwC.
 
-**Attribution.** Analysis and write-up by Chloe Truong.
